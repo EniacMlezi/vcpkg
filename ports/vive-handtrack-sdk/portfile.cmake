@@ -1,7 +1,7 @@
 vcpkg_download_distfile(ARCHIVE
-    URLS "https://dl.vive.com/SDK/HandTracking/ViveHandTracking_0.10.0.zip"
-    FILENAME "ViveHandTracking_0.10.0.zip"
-    SHA512 fc7a1e6ca1aa95c84238f112e239bcd4022377e21678a7ac5c58c767b814360eb9f483162251613186eb95fbc29646b526b94e0e496570051092c702bc71d125
+    URLS "https://dl.vive.com/SDK/vive/ViveHandTracking_1.0.0.zip"
+    FILENAME "ViveHandTracking_1.0.0.zip"
+    SHA512 d0433dc2dd09af5c38d42b6e4529b2ffe36a06f7e116e0b8a3db6e55943b6d09d683fca40943ea35c3c17aa2df77ff7a26be435362f4f5d746d06457d0f60923
 )
 
 vcpkg_extract_source_archive_ex(

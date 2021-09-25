@@ -1,7 +1,6 @@
 {
   "name": "vive-handtrack-sdk",
-  "version-string": "0.10.0",
-  "homepage": "https://developer.vive.com/resources/vive-sense/sdk/vive-hand-tracking-sdk/",
+  "version-string": "1.0.0",
   "description": "A cross platform tool to track hand position and gesture recognition using the front camera(s) of the VIVE Cosmos, VIVE Pro, VIVE, VIVE Focus and Valve Index.",
-  "dependencies": []
+  "homepage": "https://developer.vive.com/resources/vive-sense/sdk/vive-hand-tracking-sdk/"
 }
