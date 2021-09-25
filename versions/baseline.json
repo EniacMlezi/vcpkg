@@ -6833,7 +6833,7 @@
       "port-version": 2
     },
     "vive-handtrack-sdk": {
-      "baseline": "0.10.0",
+      "baseline": "1.0.0",
       "port-version": 0
     },
     "vlfeat": {
