@@ -1,7 +1,11 @@
 #[===[.md:
 # vcpkg_fixup_pkgconfig
 
-Fix common paths in *.pc files and make everything relativ to $(prefix)
+Fix common paths in *.pc files and make everything relative to $(prefix).
+Additionally, on static triplets, private entries are merged with their non-private counterparts,
+allowing pkg-config to be called without the ``--static`` flag.
+Note that vcpkg is designed to never have to call pkg-config with the ``--static`` flag,
+since a consumer cannot know if a dependent library has been built statically or not.
 
 ## Usage
 ```cmake
@@ -109,9 +113,6 @@ function(vcpkg_fixup_pkgconfig)
         endif()
     endif()
 
-    vcpkg_find_acquire_program(PKGCONFIG)
-    debug_message("Using pkg-config from: ${PKGCONFIG}")
-
     #Absolute Unix like paths 
     string(REGEX REPLACE "([a-zA-Z]):/" "/\\1/" _VCPKG_PACKAGES_DIR "${CURRENT_PACKAGES_DIR}")
     string(REGEX REPLACE "([a-zA-Z]):/" "/\\1/" _VCPKG_INSTALLED_DIR "${CURRENT_INSTALLED_DIR}")
@@ -159,23 +160,31 @@ function(vcpkg_fixup_pkgconfig)
             # --static.
             if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
                 # Libs comes before Libs.private
-                string(REGEX REPLACE "(^|\n)(Libs: [^\n]*)(.*)\nLibs.private:( [^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
+                string(REGEX REPLACE "(^|\n)(Libs: *[^\n]*)(.*)\nLibs.private:( *[^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
                 # Libs.private comes before Libs
-                string(REGEX REPLACE "(^|\n)Libs.private:( [^\n]*)(.*\nLibs: [^\n]*)" "\\3\\2" _contents "${_contents}")
+                string(REGEX REPLACE "(^|\n)Libs.private:( *[^\n]*)(.*\nLibs: *[^\n]*)" "\\3\\2" _contents "${_contents}")
                 # Only Libs.private
-                string(REGEX REPLACE "(^|\n)Libs.private: " "\\1Libs: " _contents "${_contents}")
+                string(REGEX REPLACE "(^|\n)Libs.private: *" "\\1Libs: " _contents "${_contents}")
+                # Cflags comes before Cflags.private
+                string(REGEX REPLACE "(^|\n)(Cflags: *[^\n]*)(.*)\nCflags.private:( *[^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
+                # Cflags.private comes before Cflags
+                string(REGEX REPLACE "(^|\n)Cflags.private:( *[^\n]*)(.*\nCflags: *[^\n]*)" "\\3\\2" _contents "${_contents}")
+                # Only Cflags.private
+                string(REGEX REPLACE "(^|\n)Cflags.private: *" "\\1Cflags: " _contents "${_contents}")
                 # Requires comes before Requires.private
-                string(REGEX REPLACE "(^|\n)(Requires: [^\n]*)(.*)\nRequires.private:( [^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
+                string(REGEX REPLACE "(^|\n)(Requires: *[^\n]*)(.*)\nRequires.private:( *[^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
                 # Requires.private comes before Requires
-                string(REGEX REPLACE "(^|\n)Requires.private:( [^\n]*)(.*\nRequires: [^\n]*)" "\\3\\2" _contents "${_contents}")
+                string(REGEX REPLACE "(^|\n)Requires.private:( *[^\n]*)(.*\nRequires: *[^\n]*)" "\\3\\2" _contents "${_contents}")
                 # Only Requires.private
-                string(REGEX REPLACE "(^|\n)Requires.private: " "\\1Requires: " _contents "${_contents}")
+                string(REGEX REPLACE "(^|\n)Requires.private: *" "\\1Requires: " _contents "${_contents}")
             endif()
             file(WRITE "${_file}" "prefix=\${pcfiledir}/${RELATIVE_PC_PATH}\n${_contents}")
             unset(PKG_LIB_SEARCH_PATH)
         endforeach()
 
         if(NOT _vfpkg_SKIP_CHECK) # The check can only run after all files have been corrected!
+            vcpkg_find_acquire_program(PKGCONFIG)
+            debug_message("Using pkg-config from: ${PKGCONFIG}")
             foreach(_file ${_vfpkg_${CONFIG}_FILES})
                 vcpkg_fixup_pkgconfig_check_files("${PKGCONFIG}" "${_file}" "${CONFIG}")
             endforeach()

@@ -5,8 +5,8 @@ endif()
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO abseil/abseil-cpp
-    REF 6f9d96a1f41439ac172ee2ef7ccd8edf0e5d068c #LTS 20200923, Patch 3
-    SHA512 f64fee62863f2103c1991136fd3bc2b71cd28c7ff62138ac991b5a7f81780a05e0e2bdd6a119d02e1d70dd54f989f584093957efaec94f26c9d6c3f4ee37f8ae
+    REF 278e0a071885a22dcd2fd1b5576cc44757299343 #LTS 20210324, Patch 2
+    SHA512 a9e8e9169ebcfb8bc2eca28152ad2f655f48e6281ea932eb712333f3d0aa0b6fa1a9b184f3e2ddd75d932a54b501cc5c7bb29a1c9de5d2146f82fc5754653895
     HEAD_REF master
     PATCHES
         # in C++17 mode, use std::any, std::optional, std::string_view, std::variant
@@ -15,12 +15,11 @@ vcpkg_from_github(
         # detection can cause ABI issues depending on which compiler options
         # are enabled for consuming user code
         fix-cxx-standard.patch
-        # Official patch https://github.com/abseil/abseil-cpp/commit/58a9c6d53f93078101c2c0bd98d2951e74328a55
-        fix-msvc-flags.patch
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
-    cxx17 ABSL_USE_CXX17
+    FEATURES
+        cxx17 ABSL_USE_CXX17
 )
 
 vcpkg_configure_cmake(
@@ -32,6 +31,7 @@ vcpkg_configure_cmake(
 
 vcpkg_install_cmake()
 vcpkg_fixup_cmake_targets(CONFIG_PATH lib/cmake/absl TARGET_PATH share/absl)
+vcpkg_fixup_pkgconfig()
 
 vcpkg_copy_pdbs()
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share
